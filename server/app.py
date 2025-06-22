@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, request, make_response, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -14,13 +16,59 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-@app.route('/messages')
-def messages():
-    return ''
+@app.route('/')
+def index():
+    return '<h1>Chatterbox API</h1>'
 
-@app.route('/messages/<int:id>')
-def messages_by_id(id):
-    return ''
+@app.route('/messages', methods=['GET'])
+def messages():
+    messages = []
+    for message in Message.query.order_by(Message.created_at.asc()).all():
+        message_dict = message.to_dict()
+        messages.append(message_dict)
+    
+    return make_response(jsonify(messages), 200)
+
+@app.route('/messages', methods=['POST'])
+def create_message():
+    data = request.get_json()
+    
+    new_message = Message(
+        body=data['body'],
+        username=data['username'],
+    )
+    
+    db.session.add(new_message)
+    db.session.commit()
+    
+    message_dict = new_message.to_dict()
+    
+    return make_response(jsonify(message_dict), 201)
+
+@app.route('/messages/<int:id>', methods=['PATCH'])
+def update_message(id):
+    message = Message.query.filter_by(id=id).first()
+    
+    data = request.get_json()
+    
+    for attr in data:
+        setattr(message, attr, data[attr])
+    
+    db.session.add(message)
+    db.session.commit()
+    
+    message_dict = message.to_dict()
+    
+    return make_response(jsonify(message_dict), 200)
+
+@app.route('/messages/<int:id>', methods=['DELETE'])
+def delete_message(id):
+    message = Message.query.filter_by(id=id).first()
+    
+    db.session.delete(message)
+    db.session.commit()
+    
+    return make_response('', 204)
 
 if __name__ == '__main__':
-    app.run(port=5555)
+    app.run(port=5555, debug=True)
