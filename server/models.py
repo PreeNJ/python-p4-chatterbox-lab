@@ -1,4 +1,3 @@
-# models.py
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
@@ -16,11 +15,9 @@ class Message(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String, nullable=False)
     username = db.Column(db.String, nullable=False)
-
-    # created_at must never be NULL, so give it a server_default
+ 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-
-    # updated_at should update automatically *and* start with a value
+ 
     updated_at = db.Column(
         db.DateTime,
         server_default=db.func.now(),

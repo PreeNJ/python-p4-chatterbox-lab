@@ -10,15 +10,13 @@ fake = Faker()
 with app.app_context():
     
     print("Starting seed...")
-    
-    # Delete existing messages
+ 
     Message.query.delete()
     
     print("Creating messages...")
     
     messages = []
-    
-    # Create some sample messages
+     
     usernames = ["Liza", "Duane", "Alice", "Bob", "Charlie", "Diana"]
     
     sample_messages = [
